@@ -1,6 +1,8 @@
 package cmd
 
-import "sync"
+import (
+	"sync"
+)
 
 type Command struct{
 	Name string
@@ -15,4 +17,8 @@ type APIConfig struct {
 	PreviousURL string
 	Mutex *sync.RWMutex
 	PropData map[*string]struct{}
+}
+
+func InitializeCommands() (string, error) {
+	return "Initializing...", nil
 }
