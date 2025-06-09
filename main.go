@@ -6,9 +6,7 @@ import (
 	"log"
 	"os"
 
-	"internal/cmd"
-
-	"internal/models"
+	"github.com/Aranaris/dwellstats/internal/cmd"
 )
 
 func printPrompt() {
@@ -23,14 +21,9 @@ func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
 
-	// a := "5500 Grand Lake Dr, San Antonio, TX, 78244"
+	a := "5500 Grand Lake Dr, San Antonio, TX, 78244"
 	
-	sample := models.Address{}
-	sample.Street = "5500 Grand Lake Dr"
-	sample.City = "San Antonio"
-	sample.State = "TX"
-	sample.Zip = "78244"
-	fmt.Printf("Default address: %v\n", sample)
+	fmt.Printf("Default address: %v\n", a)
 
 	printPrompt()
 
@@ -39,7 +32,10 @@ func main() {
 		text := reader.Text()
 		fmt.Println("")
 
-		cl.HandleCommand(text)
+		err = cl.HandleCommand(text)
+		if err != nil {
+			fmt.Println(err)
+		}
 		if text == "exit" {
 			break exec
 		}

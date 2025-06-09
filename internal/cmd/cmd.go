@@ -3,7 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
+
+	"github.com/Aranaris/dwellstats/internal/models"
+	"github.com/Aranaris/dwellstats/internal/request"
 )
 
 type Command struct{
@@ -17,7 +21,7 @@ type CommandList map[string]Command
 type APIConfig struct {
 	TargetURL string
 	Mutex *sync.RWMutex
-	PropData map[*string]struct{}
+	PropData map[*string]models.Property
 }
 
 func InitializeCommands() (*CommandList, error) {
@@ -36,11 +40,17 @@ func InitializeCommands() (*CommandList, error) {
 	Help := Command{
 		Name: "help",
 		Description: "prints out all supported commands",
+	}
+
+	Find := Command{
+		Name: "find",
+		Description: "given an address, retrieve property data",
 		Config: &cfg,
 	}
 
 	cl[Help.Name] = Help
 	cl[Exit.Name] = Exit
+	cl[Find.Name] = Find
 
 	return &cl, nil
 }
@@ -60,6 +70,26 @@ func (cl *CommandList) CommandExit() error {
 	return nil
 }
 
+func (cl *CommandList) CommandFind(address string) error {
+	cfg := (*cl)["find"].Config
+
+	fmt.Printf("Searching for %s...", address)
+	a, err := request.ParseAddress(address)
+	if err != nil {
+		return err
+	}
+
+	p, err := request.GetPropertyByAddress(cfg.TargetURL, a)
+	if err != nil {
+		return err
+	}
+
+	cfg.PropData[&address] = *p
+	fmt.Println(p)
+
+	return nil
+}
+
 func (cl *CommandList) HandleCommand(input string) error {
 	if input == "help" {
 		cl.CommandHelp()
@@ -69,6 +99,14 @@ func (cl *CommandList) HandleCommand(input string) error {
 	if input == "exit" {
 		cl.CommandExit()
 		return nil
+	}
+
+	s := strings.SplitN(input, " ", 2)
+	if s[0] == "find" {
+		err := cl.CommandFind(s[1])
+		if err != nil {
+			return err
+		}
 	}
 	
 	return errors.New("Command not found: " + input)
