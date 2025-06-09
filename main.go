@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"internal/cmd"
+
+	"internal/models"
 )
 
 func printPrompt() {
@@ -14,12 +16,22 @@ func printPrompt() {
 }
 
 func main() {
-	_, err := cmd.InitializeCommands()
+	cl, err := cmd.InitializeCommands()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	reader := bufio.NewScanner(os.Stdin)
+
+	// a := "5500 Grand Lake Dr, San Antonio, TX, 78244"
+	
+	sample := models.Address{}
+	sample.Street = "5500 Grand Lake Dr"
+	sample.City = "San Antonio"
+	sample.State = "TX"
+	sample.Zip = "78244"
+	fmt.Printf("Default address: %v\n", sample)
+
 	printPrompt()
 
 	exec:
@@ -27,6 +39,7 @@ func main() {
 		text := reader.Text()
 		fmt.Println("")
 
+		cl.HandleCommand(text)
 		if text == "exit" {
 			break exec
 		}
