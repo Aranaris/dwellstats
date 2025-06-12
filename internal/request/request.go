@@ -17,6 +17,10 @@ func ParseAddress(address string) (*models.Address, error) {
 		return nil, fmt.Errorf("Invalid address string")
 	}
 
+	for i, v := range segments {
+		segments[i] = strings.TrimSpace(v)
+	}
+
 	a := models.Address{
 		Street: segments[0],
 		City: segments[1],
