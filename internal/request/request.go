@@ -14,7 +14,7 @@ import (
 func ParseAddress(address string) (*models.Address, error) {
 	segments := strings.Split(address, ",")
 	if len(segments) != 4 {
-		return nil, fmt.Errorf("Invalid address string")
+		return nil, fmt.Errorf("invalid address string")
 	}
 
 	for i, v := range segments {
@@ -31,13 +31,21 @@ func ParseAddress(address string) (*models.Address, error) {
 	return &a, nil
 }
 
-func GetPropertyByAddress(endpoint string, address *models.Address) (*models.Property, error) {
+func GetPropertyByAddress(endpoint string, address string) (*models.Property, error) {
+	
+	base, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
 
-	qp := fmt.Sprintf("address=%s,%s,%s,%s", address.Street, address.City, address.State, address.Zip)
-	query := url.QueryEscape(qp)
-	req := fmt.Sprintf("%s?%s", endpoint, query)
+	q := base.Query()
+	q.Set("address", address)
 
-	resp, err := http.Get(req)
+	base.RawQuery = q.Encode()
+
+	fmt.Println(base.String())
+
+	resp, err := http.Get(base.String())
 	if err != nil {
 		return nil, err
 	}
