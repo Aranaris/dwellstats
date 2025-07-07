@@ -74,12 +74,8 @@ func (cl *CommandList) CommandFind(address string) error {
 	cfg := (*cl)["find"].Config
 
 	fmt.Printf("Searching for %s...", address)
-	a, err := request.ParseAddress(address)
-	if err != nil {
-		return err
-	}
 
-	p, err := request.GetPropertyByAddress(cfg.TargetURL, a)
+	p, err := request.GetPropertyByAddress(cfg.TargetURL, address)
 	if err != nil {
 		return err
 	}
@@ -103,6 +99,9 @@ func (cl *CommandList) HandleCommand(input string) error {
 
 	s := strings.SplitN(input, " ", 2)
 	if s[0] == "find" {
+		if len(s) < 2 {
+			return errors.New("no address provided")
+		}
 		err := cl.CommandFind(s[1])
 		if err != nil {
 			return err
