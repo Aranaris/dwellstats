@@ -29,7 +29,7 @@ func InitializeCommands() (*CommandList, error) {
 	cl := make(CommandList)
 
 	cfg := APIConfig{
-		TargetURL: "127.0.0.1:1337",
+		TargetURL: "http://127.0.0.1:1337",
 	}
 
 	Exit := Command{
@@ -73,7 +73,7 @@ func (cl *CommandList) CommandExit() error {
 func (cl *CommandList) CommandFind(address string) error {
 	cfg := (*cl)["find"].Config
 
-	fmt.Printf("Searching for %s...", address)
+	fmt.Printf("Searching for %s...\n", address)
 
 	p, err := request.GetPropertyByAddress(cfg.TargetURL, address)
 	if err != nil {
